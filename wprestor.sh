@@ -120,7 +120,7 @@ restore_sql_dump() {
     fi
 }
 
-# Function to update wp-config.php with new database settings
+# Function to update wp-config.php with new database values
 update_wp_config() {
     WP_CONFIG=$(find . -maxdepth 1 -name "wp-config.php")
     echo "wp-config.php file found: $WP_CONFIG"
