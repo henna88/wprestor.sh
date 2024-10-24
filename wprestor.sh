@@ -37,14 +37,16 @@ extract_backup() {
     if [[ "${BACKUP}" == *.tar.gz ]]; then
         echo "Extracting ${BACKUP} as a .tar.gz archive..."
         tar -zxvf "${CHOSEN_BACKUP}" &>/dev/null
+        echo "Backup ${BACKUP} was restored successfully!"
     elif [[ "${BACKUP}" == *.zip ]]; then
         echo "Extracting ${BACKUP} as a .zip archive..."
         unzip "${CHOSEN_BACKUP}" &>/dev/null
+        echo "Backup ${BACKUP} was restored successfully!"
     else
         echo "! Unsupported file format or backup is corrupted. Check it manually"
         exit 1
     fi
-    echo "Backup ${BACKUP} restored successfully!"
+    
 }
 
 # Function to create a database and a user
@@ -64,19 +66,19 @@ create_database() {
     if uapi Mysql create_database name="$DB_NAME" &>/dev/null; then
         echo -e "\nDatabase $DB_NAME created successfully."
     else
-        echo "Failed to create database $DB_NAME."
+        echo "Failed to create database $DB_NAME . Check it manually"
     fi
 
     if uapi Mysql create_user name="$DB_NAME" password="$DB_PASS" &>/dev/null; then
         echo "Database user $DB_NAME created successfully."
     else
-        echo "Failed to create database user $DB_NAME."
+        echo "Failed to create database user $DB_NAME. Check it manually"
     fi
 
     if uapi Mysql set_privileges_on_database user="$DB_NAME" database="$DB_NAME" privileges=ALL &>/dev/null; then
         echo "Privileges for user $DB_NAME on database $DB_NAME granted successfully."
     else
-        echo "Failed to grant privileges for user $DB_NAME on database $DB_NAME."
+        echo "Failed to grant privileges for user $DB_NAME on database $DB_NAME. Check it manually"
     fi
 }
 
@@ -114,7 +116,7 @@ restore_sql_dump() {
     if mysql -f -u $DB_NAME -p$DB_PASS $DB_NAME < $DUMP &>/dev/null; then
         echo "${DUMP} imported successfully"
     else
-        echo "Failed to import the .sql dump. Please check it manually"
+        echo "Failed to import the .sql dump. Please check it manually"; exit 1;
     fi
 }
 
