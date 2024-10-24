@@ -129,19 +129,18 @@ update_wp_config() {
         echo "Error: wp-config.php file not found in the current directory."
         exit 1
     fi
+echo -e "\nCurrent Database Configuration:"
+grep "define( 'DB_NAME'" "$WP_CONFIG" || echo "DB_NAME not found"
+grep "define( 'DB_USER'" "$WP_CONFIG" || echo "DB_USER not found"
+grep "define( 'DB_PASSWORD'" "$WP_CONFIG" || echo "DB_PASSWORD not found"
 
-    echo -e "\nCurrent Database Configuration:"
-    grep "define( 'DB_NAME'" "$WP_CONFIG" || echo "DB_NAME not found"
-    grep "define( 'DB_USER'" "$WP_CONFIG" || echo "DB_USER not found"
-    grep "define( 'DB_PASSWORD'" "$WP_CONFIG" || echo "DB_PASSWORD not found"
+echo -e "\nUpdating wp-config.php with new database settings..."
 
-    echo -e "\nUpdating wp-config.php with new database settings..."
-    
-    sed -i.bak "s/define( 'DB_NAME'.*/define( 'DB_NAME', '$DB_NAME' );/" "$WP_CONFIG"
-    sed -i.bak "s/define( 'DB_USER'.*/define( 'DB_USER', '$DB_NAME' );/" "$WP_CONFIG"
-    sed -i.bak "s/define( 'DB_PASSWORD'.*/define( 'DB_PASSWORD', '$DB_PASS' );/" "$WP_CONFIG"
+sed -i "s/^\(define( 'DB_NAME', '\)[^']*\('.*;\)$/\1$DB_NAME\2/" "$WP_CONFIG" || { echo "Something went wrong. Proceed further manually"; exit 1; }
+sed -i "s/^\(define( 'DB_USER', '\)[^']*\('.*;\)$/\1$DB_NAME\2/" "$WP_CONFIG" || { echo "Something went wrong. Proceed further manually"; exit 1; }
+sed -i "s/^\(define( 'DB_PASSWORD', '\)[^']*\('.*;\)$/\1$DB_PW\2/" "$WP_CONFIG" || { echo "Something went wrong. Proceed further manually"; exit 1; }
 
-    echo -e "\nVerifying the updates in wp-config.php:"
+echo -e "\nVerifying the updates in wp-config.php:"
     grep "define( 'DB_NAME'" "$WP_CONFIG" || echo "DB_NAME not found after update"
     grep "define( 'DB_USER'" "$WP_CONFIG" || echo "DB_USER not found after update"
     grep "define( 'DB_PASSWORD'" "$WP_CONFIG" || echo "DB_PASSWORD not found after update"
