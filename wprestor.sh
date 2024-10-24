@@ -130,20 +130,20 @@ update_wp_config() {
     echo "wp-config.php file found: $WP_CONFIG"
 
 echo -e "\nCurrent Database Configuration:"
-grep "define( 'DB_NAME'" "$WP_CONFIG" || {echo "DB_NAME not found. Check and proceed further manually"; exit 1; }
-grep "define( 'DB_USER'" "$WP_CONFIG" || {echo "DB_NAME not found. Check and proceed further manually"; exit 1; }
-grep "define( 'DB_PASSWORD'" "$WP_CONFIG" || {echo "DB_NAME not found. Check and proceed further manually"; exit 1; }
+grep "define( 'DB_NAME'" "$WP_CONFIG" || { echo "DB_NAME not found. Check and proceed further manually"; exit 1; }
+grep "define( 'DB_USER'" "$WP_CONFIG" || { echo "DB_NAME not found. Check and proceed further manually"; exit 1; }
+grep "define( 'DB_PASSWORD'" "$WP_CONFIG" || { echo "DB_NAME not found. Check and proceed further manually"; exit 1; }
 
 echo -e "\nUpdating wp-config.php with new database settings..."
 
 sed -i "s/^\(define( 'DB_NAME', '\)[^']*\('.*;\)$/\1$DB_NAME\2/" "$WP_CONFIG" || { echo "Something went wrong. Proceed further manually"; exit 1; }
 sed -i "s/^\(define( 'DB_USER', '\)[^']*\('.*;\)$/\1$DB_NAME\2/" "$WP_CONFIG" || { echo "Something went wrong. Proceed further manually"; exit 1; }
-sed -i "s/^\(define( 'DB_PASSWORD', '\)[^']*\('.*;\)$/\1$DB_PW\2/" "$WP_CONFIG" || { echo "Something went wrong. Proceed further manually"; exit 1; }
+sed -i "s/^\(define( 'DB_PASSWORD', '\)[^']*\('.*;\)$/\1$DB_PASS\2/" "$WP_CONFIG" || { echo "Something went wrong. Proceed further manually"; exit 1; }
 
 echo -e "\nVerifying the updates in wp-config.php:"
-    grep "define( 'DB_NAME'" "$WP_CONFIG" || {echo "DB_NAME not found. Check and proceed further manually"; exit 1; }
-    grep "define( 'DB_USER'" "$WP_CONFIG" || {echo "DB_NAME not found. Check and proceed further manually"; exit 1; }
-    grep "define( 'DB_PASSWORD'" "$WP_CONFIG" || {echo "DB_NAME not found. Check and proceed further manually"; exit 1; }
+    grep "define( 'DB_NAME'" "$WP_CONFIG" || { echo "DB_NAME not found. Check and proceed further manually"; exit 1; }
+    grep "define( 'DB_USER'" "$WP_CONFIG" || { echo "DB_NAME not found. Check and proceed further manually"; exit 1; }
+    grep "define( 'DB_PASSWORD'" "$WP_CONFIG" || { echo "DB_NAME not found. Check and proceed further manually"; exit 1; }
 
     echo -e "\nDatabase settings in wp-config.php have been updated."
 }
