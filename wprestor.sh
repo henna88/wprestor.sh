@@ -8,6 +8,7 @@ RED="\e[31m"
 GREEN="\e[32m"
 BOLDGREEN="\e[1;${GREEN}m"
 YELLOW="\e[33m"
+BOLDYELLOW="\e[1;${YELLOW}m"
 BLUE="\e[34m"
 
 # Function to find and select a backup file to restore
@@ -157,7 +158,7 @@ echo -e "\nVerifying the updates in wp-config.php:"
 }
 
 # Main script execution
-echo -e "Hello fellow concierge!\n"
+echo -e "                                                               Hello fellow concierge!\n"
 find_backup
 extract_backup
 create_database
