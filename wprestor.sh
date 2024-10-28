@@ -36,7 +36,10 @@ find_backup() {
         echo "${BACKUPS[0]}"
     fi
 
-    read -rp "> Do you want to proceed? [y/n]: " CHOICE
+    read -rp "
+--------------------------------------------------------------------------
+    
+> Do you want to proceed? [y/n]: " CHOICE
     [[ ! "${CHOICE}" =~ ^[yY](es)?$ ]] && { echo "! Ok, next time"; exit 1; }
 
     BACKUP="$(awk -F/ '{print $NF}' <<<"${CHOSEN_BACKUP}")"
@@ -45,15 +48,22 @@ find_backup() {
 # Function to extract the selected backup
 extract_backup() {
     if [[ "${BACKUP}" == *.tar.gz ]]; then
-        echo "Extracting ${BACKUP} as a .tar.gz archive..."
+        echo -e "
+        
+${BLUE}Extracting${ENDCOLOR} ${BACKUP}${BLUE} as a .tar.gz archive...${ENDCOLOR}
+        "
         tar -zxvf "${CHOSEN_BACKUP}" &>/dev/null
-        echo "Backup ${BACKUP} was restored successfully!"
+        echo -e "${GREEN}Backup ${BACKUP}${ENDCOLOR} ${GREEN}was restored successfully!${ENDCOLOR}
+--------------------------------------------------------------------------"
+        
     elif [[ "${BACKUP}" == *.zip ]]; then
-        echo "Extracting ${BACKUP} as a .zip archive..."
+echo -e "${BLUE}Extracting${ENDCOLOR} ${BACKUP}${BLUE}as a .zip archive...${ENDCOLOR}"
         unzip "${CHOSEN_BACKUP}" &>/dev/null
-        echo "Backup ${BACKUP} was restored successfully!"
+        echo -e "
+        ${GREEN}Backup${ENDCOLOR} ${BACKUP} ${GREEN}was restored successfully!${ENDCOLOR}
+--------------------------------------------------------------------------"
     else
-        echo "! Unsupported file format or backup is corrupted. Check it manually"
+        echo -e "${RED}! Unsupported file format or backup is corrupted. Check it manually${ENDCOLOR}"
         exit 1
     fi
     
@@ -66,35 +76,40 @@ create_database() {
     DB_NAME="${USER}_${DIR_NAME}"
     DB_PASS=$(tr -dc 'A-Za-z0-9_!@#$%^&*()-+=' </dev/urandom | head -c 16)
 
-    echo -e "Your database details (just in case):\n"
-    echo "Database Name: $DB_NAME"
-    echo "Database User: $DB_NAME"
-    echo "Database Password: $DB_PASS"
+    echo -e "
+Your database details (just in case):"
+    echo -e "${GREEN}Database Name:${ENDCOLOR} $DB_NAME"
+    echo -e "${GREEN}Database User:${ENDCOLOR} $DB_NAME"
+    echo -e "${GREEN}Database Password:${ENDCOLOR} $DB_PASS"
 
-    echo -e "\nCreating a new database using the details obtained...\n"
+    echo -e "
+${BLUE}Creating a new database using the details obtained...${ENDCOLOR}\n
+    "
 
     if uapi Mysql create_database name="$DB_NAME" &>/dev/null; then
-        echo -e "\nDatabase $DB_NAME created successfully."
+        echo -e "${GREEN}\nDatabase${ENDCOLOR} $DB_NAME ${GREEN}created successfully.${ENDCOLOR} "
     else
-        echo "Failed to create database $DB_NAME . Check it manually"
+        echo -e "${RED}Failed to create database $DB_NAME  .${ENDCOLOR} ${RED}Check it manually${ENDCOLOR}"
     fi
 
     if uapi Mysql create_user name="$DB_NAME" password="$DB_PASS" &>/dev/null; then
-        echo "Database user $DB_NAME created successfully."
+        echo -e "${GREEN}Database user${ENDCOLOR} $DB_NAME${GREEN} created successfully.${ENDCOLOR}"
     else
-        echo "Failed to create database user $DB_NAME. Check it manually"
+        echo -e "${RED}Failed to create database user $DB_NAME  .${ENDCOLOR} ${RED}Check it manually${ENDCOLOR}"
     fi
 
     if uapi Mysql set_privileges_on_database user="$DB_NAME" database="$DB_NAME" privileges=ALL &>/dev/null; then
-        echo "Privileges for user $DB_NAME on database $DB_NAME granted successfully."
+        echo -e "${GREEN}Privileges for user${ENDCOLOR} $DB_NAME ${GREEN}on database${ENDCOLOR} $DB_NAME ${GREEN}granted successfully.${ENDCOLOR}"
     else
-        echo "Failed to grant privileges for user $DB_NAME on database $DB_NAME. Check it manually"
+        echo -e "${RED}Failed to grant privileges for user${ENDCOLOR} $DB_NAME ${RED}on database${ENDCOLOR} $DB_NAME ${RED}. Check it manually${ENDCOLOR}"
     fi
 }
 
 # Function to find and restore SQL dumps
 restore_sql_dump() {
-    echo -e "\nAvailable .sql dumps to restore:\n"
+    echo -e "
+--------------------------------------------------------------------------
+    \nAvailable .sql dumps to restore:\n"
     
     SQL_DUMPS=($(find . -maxdepth 1 -type f -name "*.sql"))
     [[ -z "${SQL_DUMPS}" ]] && { echo "! No .sql dumps found within ${PWD}"; exit 1; }
@@ -116,46 +131,56 @@ restore_sql_dump() {
         echo "${CHOSEN_DUMP}"
     fi
 
-    read -rp "> Do you want to proceed? [y/n]: " CHOICE
+    read -rp "
+
+> Do you want to proceed? [y/n]: " CHOICE
     [[ ! "${CHOICE}" =~ ^[yY](es)?$ ]] && { echo "! Ok, next time"; exit 1; }
 
     DUMP="$(awk -F/ '{print $NF}' <<<"${CHOSEN_DUMP}")"
 
-    echo -e "\nImporting selected dump to the database..."
+    echo -e "
+    \n${BLUE}Importing selected dump to the database...${ENDCOLOR}"
 
     if mysql -f -u "$DB_NAME" -p"$DB_PASS" "$DB_NAME" < "$DUMP" &>/dev/null; then
-        echo "${DUMP} imported successfully"
+        echo -e "
+${DUMP} ${GREEN}imported successfully${ENDCOLOR}"
     else
-        echo "Failed to import the .sql dump. Please check it manually"; exit 1;
+        echo -e "${RED}Failed to import the .sql dump. Please check it manually${ENDCOLOR}"; exit 1;
     fi
 }
 
 # Function to update wp-config.php with new database values
 update_wp_config() {
+    echo -e "
+--------------------------------------------------------------------------
+
+Let's update ${GREEN}wp-confing.php${ENDCOLOR} file using the db details we have"
     WP_CONFIG=$(find . -maxdepth 1 -name "wp-config.php")
     if [[ -z "$WP_CONFIG" ]]; then
-        echo "Error: wp-config.php file not found in the current directory."
+        echo -e "${RED}Error: ${GREEN}wp-config.php${ENDCOLOR} file not found in the current directory.${ENDCOLOR}"
         exit 1
     fi
-    echo "wp-config.php file found: $WP_CONFIG"
 
 echo -e "\nCurrent Database Configuration:"
 grep "define( 'DB_NAME'" "$WP_CONFIG" || { echo "DB_NAME not found. Check and proceed further manually"; exit 1; }
 grep "define( 'DB_USER'" "$WP_CONFIG" || { echo "DB_NAME not found. Check and proceed further manually"; exit 1; }
 grep "define( 'DB_PASSWORD'" "$WP_CONFIG" || { echo "DB_NAME not found. Check and proceed further manually"; exit 1; }
 
-echo -e "\nUpdating wp-config.php with new database values..."
+echo -e "
+\n${BLUE}Updating ${GREEN}wp-config.php${ENDCOLOR} ${BLUE}with new database values...${ENDCOLOR}"
 
 sed -i "s/^\(define( 'DB_NAME', '\)[^']*\('.*;\)$/\1$DB_NAME\2/" "$WP_CONFIG" || { echo "Something went wrong. Proceed further manually"; exit 1; }
 sed -i "s/^\(define( 'DB_USER', '\)[^']*\('.*;\)$/\1$DB_NAME\2/" "$WP_CONFIG" || { echo "Something went wrong. Proceed further manually"; exit 1; }
 sed -i "s/^\(define( 'DB_PASSWORD', '\)[^']*\('.*;\)$/\1$DB_PASS\2/" "$WP_CONFIG" || { echo "Something went wrong. Proceed further manually"; exit 1; }
 
-echo -e "\nVerifying the updates in wp-config.php:"
+echo -e "\nVerify the updates in ${GREEN}wp-config.php${ENDCOLOR}:"
     grep "define( 'DB_NAME'" "$WP_CONFIG" || { echo "DB_NAME not found. Check and proceed further manually"; exit 1; }
     grep "define( 'DB_USER'" "$WP_CONFIG" || { echo "DB_NAME not found. Check and proceed further manually"; exit 1; }
     grep "define( 'DB_PASSWORD'" "$WP_CONFIG" || { echo "DB_NAME not found. Check and proceed further manually"; exit 1; }
 
-    echo -e "\nDatabase settings in wp-config.php have been updated."
+    echo -e "\n
+    ${BOLDGREEN}Database settings in wp-config.php have been updated. Restoration finished${ENDCOLOR}
+    "
 }
 
 # Main script execution
@@ -165,3 +190,6 @@ extract_backup
 create_database
 restore_sql_dump
 update_wp_config
+
+#Disable the next string if you don't want the script delets itself in the end
+#rm --"$0"
