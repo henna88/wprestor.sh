@@ -2,7 +2,6 @@
 
 # author Gennadiy Tselischev
 
-#Colors: 
 # Colors
 ENDCOLOR="\e[0m"
 RED="\e[31m"
@@ -71,9 +70,10 @@ echo -e "${BLUE}Extracting${ENDCOLOR} ${BACKUP}${BLUE}as a .zip archive...${ENDC
 
 # Function to create a database and a user
 create_database() {
-    DIR_NAME="$PWD"
-    DIR_NAME=$(basename "$PWD" | rev | cut -d. -f2- | rev)
-    DB_NAME="${USER}_${DIR_NAME}"
+    #DIR_NAME="$PWD"
+    #DIR_NAME=$(basename "$PWD" | rev | cut -d. -f2- | rev)
+    RANDOM_NUMBER=$(shuf -i 100-999 -n 1)
+    DB_NAME="${USER}_${RANDOM_NUMBER}"If 
     DB_PASS=$(tr -dc 'A-Za-z0-9_!@#$%^&*()-+=' </dev/urandom | head -c 16)
 
     echo -e "
