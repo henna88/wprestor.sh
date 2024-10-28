@@ -191,5 +191,3 @@ create_database
 restore_sql_dump
 update_wp_config
 
-#Disable the next string if you don't want the script delets itself in the end
-#rm --"$0"
