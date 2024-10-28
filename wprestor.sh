@@ -3,12 +3,13 @@
 # author Gennadiy Tselischev
 
 #Colors: 
+# Colors
 ENDCOLOR="\e[0m"
 RED="\e[31m"
 GREEN="\e[32m"
-BOLDGREEN="\e[1;${GREEN}m"
+BOLDGREEN="\e[1;32m"
 YELLOW="\e[33m"
-BOLDYELLOW="\e[1;${YELLOW}m"
+BOLDYELLOW="\e[1;33m"
 BLUE="\e[34m"
 
 # Function to find and select a backup file to restore
