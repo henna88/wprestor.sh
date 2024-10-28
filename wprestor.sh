@@ -2,6 +2,14 @@
 
 # author Gennadiy Tselischev
 
+#Colors: 
+ENDCOLOR="\e[0m"
+RED="\e[31m"
+GREEN="\e[32m"
+BOLDGREEN="\e[1;${GREEN}m"
+YELLOW="\e[33m"
+BLUE="\e[34m"
+
 # Function to find and select a backup file to restore
 find_backup() {
     echo -e "\nAvailable backups to restore:\n"
@@ -134,7 +142,7 @@ grep "define( 'DB_NAME'" "$WP_CONFIG" || { echo "DB_NAME not found. Check and pr
 grep "define( 'DB_USER'" "$WP_CONFIG" || { echo "DB_NAME not found. Check and proceed further manually"; exit 1; }
 grep "define( 'DB_PASSWORD'" "$WP_CONFIG" || { echo "DB_NAME not found. Check and proceed further manually"; exit 1; }
 
-echo -e "\nUpdating wp-config.php with new database settings..."
+echo -e "\nUpdating wp-config.php with new database values..."
 
 sed -i "s/^\(define( 'DB_NAME', '\)[^']*\('.*;\)$/\1$DB_NAME\2/" "$WP_CONFIG" || { echo "Something went wrong. Proceed further manually"; exit 1; }
 sed -i "s/^\(define( 'DB_USER', '\)[^']*\('.*;\)$/\1$DB_NAME\2/" "$WP_CONFIG" || { echo "Something went wrong. Proceed further manually"; exit 1; }
@@ -149,7 +157,7 @@ echo -e "\nVerifying the updates in wp-config.php:"
 }
 
 # Main script execution
-echo -e "Hello fellow concierge! Let's restore another site today =)\n"
+echo -e "Hello fellow concierge!\n"
 find_backup
 extract_backup
 create_database
