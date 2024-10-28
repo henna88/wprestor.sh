@@ -158,7 +158,7 @@ echo -e "\nVerifying the updates in wp-config.php:"
 }
 
 # Main script execution
-echo -e "                                                               Hello fellow concierge!\n"
+echo -e "                                             ${BOLDGREEN}Hello fellow concierge! ${ENDCOLOR}\n"
 find_backup
 extract_backup
 create_database
