@@ -73,7 +73,7 @@ create_database() {
     #DIR_NAME="$PWD"
     #DIR_NAME=$(basename "$PWD" | rev | cut -d. -f2- | rev)
     RANDOM_NUMBER=$(shuf -i 100-999 -n 1)
-    DB_NAME="${USER}_${RANDOM_NUMBER}" 
+    DB_NAME="${USER}_wp${RANDOM_NUMBER}"
     DB_PASS=$(tr -dc 'A-Za-z0-9_!@#$%^&*()-+=' </dev/urandom | head -c 16)
 
     echo -e "
