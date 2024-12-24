@@ -11,6 +11,13 @@ YELLOW="\e[33m"
 BOLDYELLOW="\e[1;33m"
 BLUE="\e[34m"
 
+# Function make sure the script is not run as root
+check_user() {
+    user_id="$(id -u)"
+    [[ "${user_id}" -eq 0 ]] && echo "You should not run it as root!" && exit 1
+}
+
+
 # Function to find and select a backup file to restore
 find_backup() {
     echo -e "\nAvailable backups to restore:\n"
@@ -185,6 +192,7 @@ echo -e "\nVerify the updates in ${GREEN}wp-config.php${ENDCOLOR}:"
 
 # Main script execution
 echo -e "                                             ${BOLDGREEN}Hello fellow concierge! ${ENDCOLOR}\n"
+check_user
 find_backup
 extract_backup
 create_database
