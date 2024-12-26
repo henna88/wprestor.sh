@@ -11,10 +11,18 @@ YELLOW="\e[33m"
 BOLDYELLOW="\e[1;33m"
 BLUE="\e[34m"
 
+SEPARATOR="\n$(printf '%.0s-' {1..40})\n" #separator variable (used to divide text in the script output)
+
+# error function
+err() {
+    echo -e "${RED}ERROR: ${1}${ENDCOLOR}"
+    exit 1
+}
+
 # Function make sure the script is not run as root
 check_user() {
     user_id="$(id -u)"
-    [[ "${user_id}" -eq 0 ]] && echo "You should not run it as root!" && exit 1
+    [[ "${user_id}" -eq 0 ]] && err "You should not run it as root!"
 }
 
 
@@ -23,7 +31,7 @@ find_backup() {
     echo -e "\nAvailable backups to restore:\n"
     
     BACKUPS=($(find "${PWD}" -type f \( -name "*.zip" -o -name "*.tar.gz" \)))
-    [[ -z "${BACKUPS}" ]] && { echo "! No backups found within ${PWD}"; exit 1; }
+    [[ -z "${BACKUPS}" ]] && err "No backups found within ${PWD}"
 
     if [[ "${#BACKUPS[@]}" -gt 1 ]]; then
         NUM=1
@@ -33,20 +41,19 @@ find_backup() {
         done | column -t
 
         read -p "> Choose the backup: " BACKUP_CHOICE
-        [[ ! "${BACKUP_CHOICE}" =~ ^[1-9]{1}[0-9]*$ ]] && { echo "! Invalid choice"; exit 1; }
+        [[ ! "${BACKUP_CHOICE}" =~ ^[1-9]{1}[0-9]*$ ]] && err "Invalid choice"
         ARRAY_MAPPER=$((BACKUP_CHOICE-1))
-        [[ -z "${BACKUPS[${ARRAY_MAPPER}]}" ]] && { echo "! Invalid choice"; exit 1; }
+        [[ -z "${BACKUPS[${ARRAY_MAPPER}]}" ]] && err "Invalid choice"
         CHOSEN_BACKUP="${BACKUPS[${ARRAY_MAPPER}]}"
     else
         CHOSEN_BACKUP="${BACKUPS[0]}"
         echo "${BACKUPS[0]}"
     fi
 
-    read -rp "
---------------------------------------------------------------------------
+    echo -e "${SEPARATOR}"
     
-> Do you want to proceed? [y/n]: " CHOICE
-    [[ ! "${CHOICE}" =~ ^[yY](es)?$ ]] && { echo "! Ok, next time"; exit 1; }
+    read -rp "> Do you want to proceed? [y/n]: " CHOICE
+    [[ ! "${CHOICE}" =~ ^[yY](es)?$ ]] && err "Ok, next time"
 
     BACKUP="$(awk -F/ '{print $NF}' <<<"${CHOSEN_BACKUP}")"
 }
