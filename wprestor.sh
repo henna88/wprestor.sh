@@ -67,19 +67,30 @@ find_backup() {
 extract_backup() {
     if [[ "${BACKUP}" == *.tar.gz ]]; then
         echo -e "\n${BLUE}Extracting${ENDCOLOR} ${BACKUP}${BLUE} as a .tar.gz archive...${ENDCOLOR}"
+        
         tar -zxvf "${CHOSEN_BACKUP}" &>/dev/null
+        if [[ $? -ne 0 ]]; then  
+            err "${RED}! The backup is corrupted or the extraction failed. Please check manually.${ENDCOLOR}"
+        fi
+
         echo -e "${GREEN}Backup ${BACKUP}${ENDCOLOR} ${GREEN}was restored successfully!${ENDCOLOR}"
         echo -e "${SEPARATOR}"
         
     elif [[ "${BACKUP}" == *.zip ]]; then
         echo -e "${BLUE}Extracting${ENDCOLOR} ${BACKUP}${BLUE} as a .zip archive...${ENDCOLOR}"
+        
         unzip "${CHOSEN_BACKUP}" &>/dev/null
+        if [[ $? -ne 0 ]]; then 
+            err "${RED}! The backup is corrupted or the extraction failed. Please check manually.${ENDCOLOR}"
+        fi
+        
         echo -e "\n${GREEN}Backup${ENDCOLOR} ${BACKUP} ${GREEN}was restored successfully!${ENDCOLOR}"
         echo -e "${SEPARATOR}"
     else
         err "${RED}! Unsupported file format or backup is corrupted. Check it manually${ENDCOLOR}"
     fi
 }
+
 
 
 # Function to create a database and a user
