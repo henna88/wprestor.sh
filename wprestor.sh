@@ -152,8 +152,8 @@ restore_sql_dump() {
 create_database() {
     
     local RANDOM_NUMBER=$(shuf -i 100-999 -n 1)
-    local DB_NAME="${USER}_wpr${RANDOM_NUMBER}"
-    local DB_PASS=$(tr -dc 'A-Za-z0-9_!@#$%^&*()-+=' </dev/urandom | head -c 16)
+    DB_NAME="${USER}_wpr${RANDOM_NUMBER}"
+    DB_PASS=$(tr -dc 'A-Za-z0-9_!@#$%^&*()-+=' </dev/urandom | head -c 16)
 
     # Log and display database details
     echo -e "\nYour database details (just in case):"
