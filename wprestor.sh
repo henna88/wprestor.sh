@@ -68,41 +68,48 @@ find_backup() {
 
 # Function to extract the selected backup
 extract_backup() {
-   
     if [[ "${BACKUP}" == *.tar.gz ]]; then
-        echo -e "\n${BLUE}Extracting${ENDCOLOR} ${BACKUP}${BLUE} as a .tar.gz archive...${ENDCOLOR}"
+        echo -e "\n${BLUE}Checking integrity of${ENDCOLOR} ${BACKUP}${BLUE} as a .tar.gz archive...${ENDCOLOR}"
+        echo "$(date '+%Y-%m-%d %H:%M:%S') - Checking integrity of ${BACKUP} as a .tar.gz archive..." >> "$LOG_FILE"
+
+        if ! tar -tzf "${BACKUP}" >> "$LOG_FILE" 2>&1; then
+            err "The archive ${BACKUP} is corrupted or invalid. Details logged to $LOG_FILE."
+        fi
+
+        echo -e "${BLUE}Extracting${ENDCOLOR} ${BACKUP}${BLUE} as a .tar.gz archive...${ENDCOLOR}"
         echo "$(date '+%Y-%m-%d %H:%M:%S') - Extracting ${BACKUP} as a .tar.gz archive..." >> "$LOG_FILE"
         
         if tar -zxvf "${BACKUP}" >> "$LOG_FILE" 2>&1; then
             echo -e "${GREEN}Backup ${BACKUP}${ENDCOLOR} ${GREEN}was restored successfully!${ENDCOLOR}"
             echo "$(date '+%Y-%m-%d %H:%M:%S') - Backup ${BACKUP} was restored successfully!" >> "$LOG_FILE"
         else
-            echo -e "${RED}! The backup is corrupted or the extraction failed. Please check manually.${ENDCOLOR}"
-            echo "$(date '+%Y-%m-%d %H:%M:%S') - Error: Extraction failed for ${BACKUP}. Please check manually." >> "$LOG_FILE"
+            err "Extraction failed for ${BACKUP}. Please check manually. Details logged to $LOG_FILE."
         fi
 
-        echo -e "${SEPARATOR}"
-
     elif [[ "${BACKUP}" == *.zip ]]; then
+        echo -e "\n${BLUE}Checking integrity of${ENDCOLOR} ${BACKUP}${BLUE} as a .zip archive...${ENDCOLOR}"
+        echo "$(date '+%Y-%m-%d %H:%M:%S') - Checking integrity of ${BACKUP} as a .zip archive..." >> "$LOG_FILE"
+
+        if ! unzip -t "${BACKUP}" >> "$LOG_FILE" 2>&1; then
+            err "The archive ${BACKUP} is corrupted or invalid. Details logged to $LOG_FILE."
+        fi
+
         echo -e "${BLUE}Extracting${ENDCOLOR} ${BACKUP}${BLUE} as a .zip archive...${ENDCOLOR}"
         echo "$(date '+%Y-%m-%d %H:%M:%S') - Extracting ${BACKUP} as a .zip archive..." >> "$LOG_FILE"
         
         if unzip "${BACKUP}" >> "$LOG_FILE" 2>&1; then
-            echo -e "\n${GREEN}Backup${ENDCOLOR} ${BACKUP} ${GREEN}was restored successfully!${ENDCOLOR}"
+            echo -e "${GREEN}Backup${ENDCOLOR} ${BACKUP} ${GREEN}was restored successfully!${ENDCOLOR}"
             echo "$(date '+%Y-%m-%d %H:%M:%S') - Backup ${BACKUP} was restored successfully!" >> "$LOG_FILE"
         else
-            echo -e "${RED}! The backup is corrupted or the extraction failed. Please check manually.${ENDCOLOR}"
-            echo "$(date '+%Y-%m-%d %H:%M:%S') - Error: Extraction failed for ${BACKUP}. Please check manually." >> "$LOG_FILE"
+            err "Extraction failed for ${BACKUP}. Please check manually. Details logged to $LOG_FILE."
         fi
 
-        echo -e "${SEPARATOR}"
     else
-        echo -e "${RED}! Unsupported file format or backup is corrupted. Check it manually${ENDCOLOR}"
-        echo "$(date '+%Y-%m-%d %H:%M:%S') - Error: Unsupported file format or corrupted backup for ${BACKUP}." >> "$LOG_FILE"
+        err "Unsupported file format or corrupted backup for ${BACKUP}. Please check manually."
     fi
+
+    echo -e "${SEPARATOR}"
 }
-
-
 
 
 # Function to find and restore SQL dumps
