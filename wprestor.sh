@@ -158,7 +158,7 @@ create_database() {
     
     local RANDOM_NUMBER=$(shuf -i 100-999 -n 1)
     DB_NAME="${USER}_wpr${RANDOM_NUMBER}"
-    DB_PASS=$(tr -dc 'A-Za-z0-9_!@#$%^&*()-+=' </dev/urandom | head -c 16)
+    DB_PASS=$(tr -dc 'A-Za-z0-9_!@#$%^&*()-+=' </dev/urandom | head -c 12)
 
     # Log and display database details
     echo -e "\nYour database details (just in case):"
@@ -229,7 +229,7 @@ update_wp_config() {
     grep "define( 'DB_PASSWORD'" "$WP_CONFIG" || err "DB_PASSWORD not found. Check and proceed further manually"
 
     echo -e "\n${BOLDGREEN}Database settings in wp-config.php have been updated. Restoration finished${ENDCOLOR}"
-    echo -e "Dont forget to remove $LOG_FILE"
+    echo -e "Don't forget to remove $LOG_FILE"
     echo -e "${SEPARATOR}"
 }
 
