@@ -137,11 +137,15 @@ restore_sql_dump() {
 
     echo -e "\n${BLUE}Importing selected dump to the database...${ENDCOLOR}"
 
-    if mysql -f -u "$DB_NAME" -p"$DB_PASS" "$DB_NAME" < "$DUMP" &>/dev/null; then
-        echo -e "\n${DUMP} ${GREEN}imported successfully${ENDCOLOR}"
-    else
-        err "${RED}Failed to import the .sql dump. Please check it manually${ENDCOLOR}"
-    fi
+mysql -f -u "$DB_NAME" -p"$DB_PASS" "$DB_NAME" < "$DUMP" >> "$LOG_FILE" 2>&1
+
+if [ $? -eq 0 ]; then
+    echo -e "\n${DUMP} ${GREEN}imported successfully${ENDCOLOR}"
+    echo "$(date '+%Y-%m-%d %H:%M:%S') - ${DUMP} imported successfully." >> "$LOG_FILE"  # Логируем успешный импорт
+else
+    err "${RED}Failed to import the .sql dump. Please check it manually${ENDCOLOR}"
+    echo "$(date '+%Y-%m-%d %H:%M:%S') - Failed to import ${DUMP}. Please check manually." >> "$LOG_FILE"  # Логируем ошибку
+fi
 
     echo -e "${SEPARATOR}"
 }
