@@ -22,7 +22,7 @@ err() {
 
 # Function to make sure the script is not run as root
 check_user() {
-    user_id="$(id -u)"
+    local user_id="$(id -u)"
     [[ "${user_id}" -eq 0 ]] && err "You should not run it as root!"
 }
 
@@ -36,21 +36,22 @@ check_home_directory() {
 find_backup() {
     echo -e "\nAvailable backups to restore:\n"
     
-    BACKUPS=($(find "${PWD}" -type f \( -name "*.zip" -o -name "*.tar.gz" \)))
+   local BACKUPS=($(find "${PWD}" -type f \( -name "*.zip" -o -name "*.tar.gz" \)))
     [[ -z "${BACKUPS}" ]] && err "No backups found within ${PWD}"
 
     if [[ "${#BACKUPS[@]}" -gt 1 ]]; then
-        NUM=1
+        local NUM=1
         for i in "${BACKUPS[@]}"; do
             echo "${NUM}. $i"
             NUM=$((NUM+1))
         done | column -t
 
+        local BACKUP_CHOICE
         read -p "> Choose the backup: " BACKUP_CHOICE
         [[ ! "${BACKUP_CHOICE}" =~ ^[1-9]{1}[0-9]*$ ]] && err "Invalid choice"
-        ARRAY_MAPPER=$((BACKUP_CHOICE-1))
+        local ARRAY_MAPPER=$((BACKUP_CHOICE-1))
         [[ -z "${BACKUPS[${ARRAY_MAPPER}]}" ]] && err "Invalid choice"
-        CHOSEN_BACKUP="${BACKUPS[${ARRAY_MAPPER}]}"
+        local CHOSEN_BACKUP="${BACKUPS[${ARRAY_MAPPER}]}"
     else
         CHOSEN_BACKUP="${BACKUPS[0]}"
         echo "${BACKUPS[0]}"
@@ -58,6 +59,7 @@ find_backup() {
 
     echo -e "${SEPARATOR}"
     
+    local CHOICE
     read -rp "> Do you want to proceed? [y/n]: " CHOICE
     [[ ! "${CHOICE}" =~ ^[yY](es)?$ ]] && err "Ok, next time"
 
@@ -66,6 +68,7 @@ find_backup() {
 
 # Function to extract the selected backup
 extract_backup() {
+   
     if [[ "${BACKUP}" == *.tar.gz ]]; then
         echo -e "\n${BLUE}Extracting${ENDCOLOR} ${BACKUP}${BLUE} as a .tar.gz archive...${ENDCOLOR}"
         echo "$(date '+%Y-%m-%d %H:%M:%S') - Extracting ${BACKUP} as a .tar.gz archive..." >> "$LOG_FILE"
@@ -104,6 +107,7 @@ extract_backup() {
 
 # Function to create a database and a user
 restore_sql_dump() {
+    local SQL_DUMPS DUMP_CHOICE ARRAY_MAPPER CHOSEN_DUMP CHOICE
     echo -e "Available .sql dumps to restore:\n"
     
     SQL_DUMPS=($(find . -maxdepth 1 -type f -name "*.sql"))
@@ -146,9 +150,10 @@ restore_sql_dump() {
 
 # Function to find and restore SQL dumps
 create_database() {
-    RANDOM_NUMBER=$(shuf -i 100-999 -n 1)
-    DB_NAME="${USER}_wpr${RANDOM_NUMBER}"
-    DB_PASS=$(tr -dc 'A-Za-z0-9_!@#$%^&*()-+=' </dev/urandom | head -c 16)
+    
+    local RANDOM_NUMBER=$(shuf -i 100-999 -n 1)
+    local DB_NAME="${USER}_wpr${RANDOM_NUMBER}"
+    local DB_PASS=$(tr -dc 'A-Za-z0-9_!@#$%^&*()-+=' </dev/urandom | head -c 16)
 
     # Log and display database details
     echo -e "\nYour database details (just in case):"
@@ -197,7 +202,7 @@ create_database() {
 # Function to update wp-config.php with new database values
 update_wp_config() {
     echo -e "Let's update ${GREEN}wp-config.php${ENDCOLOR} file using the db details we have"
-    WP_CONFIG=$(find . -maxdepth 1 -name "wp-config.php")
+    local WP_CONFIG=$(find . -maxdepth 1 -name "wp-config.php")
     if [[ -z "$WP_CONFIG" ]]; then
         err "${RED}Error: ${GREEN}wp-config.php${ENDCOLOR} file not found in the current directory.${ENDCOLOR}"
     fi
