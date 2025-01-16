@@ -105,7 +105,7 @@ extract_backup() {
 
 
 
-# Function to create a database and a user
+# Function to find and restore SQL dumps
 restore_sql_dump() {
     local SQL_DUMPS DUMP_CHOICE ARRAY_MAPPER CHOSEN_DUMP CHOICE
     echo -e "Available .sql dumps to restore:\n"
@@ -148,7 +148,8 @@ restore_sql_dump() {
 
 
 
-# Function to find and restore SQL dumps
+
+# Function to create a database and a user
 create_database() {
     
     local RANDOM_NUMBER=$(shuf -i 100-999 -n 1)
