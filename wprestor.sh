@@ -31,6 +31,24 @@ check_home_directory() {
     ! grep "^${HOME}" <<< "${PWD}" && err "You should run it under user homedir!"
 }
 
+# Function to check if the destination folder does not contain wp files
+check_for_default_wp_files() {
+
+    if [[ -d "wp-content" || -d "wp-includes" || -d "wp-admin" ]]; then
+        err "Error: Default WordPress directories (wp-content, wp-includes, wp-admin) found in the current directory. Please make sure you are running the script in the correct directory."
+    fi
+
+    if ls *.php 1> /dev/null 2>&1; then
+        err "Error: PHP files found in the current directory. Please make sure you are running the script in the correct directory."
+    fi
+
+    if ls *.php 1> /dev/null 2>&1 || [[ -f ".htaccess" ]]; then
+        err "PHP files or .htaccess file found in the directory. Please clean the directory and try again."
+    fi
+
+}
+
+
 
 # Function to find and select a backup file to restore
 find_backup() {
@@ -245,6 +263,7 @@ update_wp_config() {
 echo -e "                                             ${BOLDGREEN}Hello fellow concierge! ${ENDCOLOR}\n"
 check_user
 check_home_directory
+check_for_default_wp_files
 find_backup
 extract_backup
 create_database
