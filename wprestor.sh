@@ -70,7 +70,7 @@ extract_backup() {
         echo -e "\n${BLUE}Extracting${ENDCOLOR} ${BACKUP}${BLUE} as a .tar.gz archive...${ENDCOLOR}"
         echo "$(date '+%Y-%m-%d %H:%M:%S') - Extracting ${BACKUP} as a .tar.gz archive..." >> "$LOG_FILE"
         
-        if tar -zxvf "${CHOSEN_BACKUP}" >> "$LOG_FILE" 2>&1; then
+        if tar -zxvf "${BACKUP}" >> "$LOG_FILE" 2>&1; then
             echo -e "${GREEN}Backup ${BACKUP}${ENDCOLOR} ${GREEN}was restored successfully!${ENDCOLOR}"
             echo "$(date '+%Y-%m-%d %H:%M:%S') - Backup ${BACKUP} was restored successfully!" >> "$LOG_FILE"
         else
@@ -84,7 +84,7 @@ extract_backup() {
         echo -e "${BLUE}Extracting${ENDCOLOR} ${BACKUP}${BLUE} as a .zip archive...${ENDCOLOR}"
         echo "$(date '+%Y-%m-%d %H:%M:%S') - Extracting ${BACKUP} as a .zip archive..." >> "$LOG_FILE"
         
-        if unzip "${CHOSEN_BACKUP}" >> "$LOG_FILE" 2>&1; then
+        if unzip "${BACKUP}" >> "$LOG_FILE" 2>&1; then
             echo -e "\n${GREEN}Backup${ENDCOLOR} ${BACKUP} ${GREEN}was restored successfully!${ENDCOLOR}"
             echo "$(date '+%Y-%m-%d %H:%M:%S') - Backup ${BACKUP} was restored successfully!" >> "$LOG_FILE"
         else
