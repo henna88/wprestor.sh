@@ -126,7 +126,7 @@ restore_sql_dump() {
         echo "${CHOSEN_DUMP}"
     fi
 
-    read -rp "\n> Do you want to proceed? [y/n]: " CHOICE
+    read -rp " Do you want to proceed? [y/n]: " CHOICE
     [[ ! "${CHOICE}" =~ ^[yY](es)?$ ]] && err "! Ok, next time"
 
     DUMP="$(awk -F/ '{print $NF}' <<<"${CHOSEN_DUMP}")"
