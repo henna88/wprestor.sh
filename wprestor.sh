@@ -19,7 +19,7 @@ err() {
     exit 1
 }
 
-# Function make sure the script is not run as root
+# Function to make sure the script is not run as root
 check_user() {
     user_id="$(id -u)"
     [[ "${user_id}" -eq 0 ]] && err "You should not run it as root!"
