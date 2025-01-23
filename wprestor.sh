@@ -262,7 +262,7 @@ update_wp_config() {
         err "${RED}Error: ${GREEN}wp-config.php${ENDCOLOR} file not found in the current directory.${ENDCOLOR}"
     fi
 
-    echo -e "\nCurrent Database Configuration:"
+    echo -e "\nOld ${GREEN}wp-config.php${ENDCOLOR} configuration:"
     grep "define( 'DB_NAME'" "$WP_CONFIG" || err "DB_NAME not found. Check and proceed further manually"
     grep "define( 'DB_USER'" "$WP_CONFIG" || err "DB_USER not found. Check and proceed further manually"
     grep "define( 'DB_PASSWORD'" "$WP_CONFIG" || err "DB_PASSWORD not found. Check and proceed further manually"
@@ -276,7 +276,7 @@ update_wp_config() {
     sed -i "s/^\(define( 'DB_USER', '\)[^']*\('.*;\)$/\1$DB_NAME\2/" "$WP_CONFIG" || err "Something went wrong. Proceed further manually"
     sed -i "s/^\(define( 'DB_PASSWORD', '\)[^']*\('.*;\)$/\1$ESCAPED_DB_PASS\2/" "$WP_CONFIG" || err "Something went wrong. Proceed further manually"
 
-    echo -e "\nVerify the updates in ${GREEN}wp-config.php${ENDCOLOR}:"
+    echo -e "\nNew ${GREEN}wp-config.php${ENDCOLOR} configuration:"
     grep "define( 'DB_NAME'" "$WP_CONFIG" || err "DB_NAME not found. Check and proceed further manually"
     grep "define( 'DB_USER'" "$WP_CONFIG" || err "DB_USER not found. Check and proceed further manually"
     grep "define( 'DB_PASSWORD'" "$WP_CONFIG" || err "DB_PASSWORD not found. Check and proceed further manually"
