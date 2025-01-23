@@ -183,13 +183,32 @@ fi
 }
 
 
-
-
 # Function to create a database and a user
 create_database() {
-    
-    local RANDOM_NUMBER=$(shuf -i 100-999 -n 1)
-    DB_NAME="${USER}_wpr${RANDOM_NUMBER}"
+    # Function to check if a database already exists
+    database_exists() {
+        local db_name="$1"
+        local cpanel_user=$(whoami)
+        local existing_databases=$(uapi --output=jsonpretty --user="$cpanel_user" Mysql list_databases | jq -r '.result.data[].database')
+
+        for db in $existing_databases; do
+            if [[ "$db" == "$db_name" ]]; then
+                return 0  # Database exists
+            fi
+        done
+        return 1  # Database does not exist
+    }
+
+    # Generate a unique database name
+    while true; do
+        local RANDOM_NUMBER=$(shuf -i 100-999 -n 1)
+        DB_NAME="${USER}_wpr${RANDOM_NUMBER}"
+        
+        if ! database_exists "$DB_NAME"; then
+            break
+        fi
+    done
+
     DB_PASS=$(tr -dc 'A-Za-z0-9_!@#$%^*()-+=' </dev/urandom | head -c 12)
 
     # Log and display database details
