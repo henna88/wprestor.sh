@@ -31,22 +31,29 @@ check_home_directory() {
     ! grep "^${HOME}" <<< "${PWD}" && err "You should run it under user homedir!"
 }
 
-# Function to check if the destination folder does not contain wp files
-check_for_default_wp_files() {
+#Function to check if there are unwanted files to move them to a separate folder
+backup_unwanted_files() {
+    local backup_dir="previous_folder_backup"
 
-    if [[ -d "wp-content" || -d "wp-includes" || -d "wp-admin" ]]; then
-        err "Error: Default WordPress directories (wp-content, wp-includes, wp-admin) found in the current directory. Please make sure you are running the script in the correct directory."
+    unwanted_items=$(find . -maxdepth 1 \( ! -name "*.tar.gz" ! -name "*.zip" ! -name "*.sh" \))
+
+    if [[ -n "$unwanted_items" ]]; then
+        echo -e "${BLUE}Unwanted files and folders detected. Moving them to ${backup_dir}...${ENDCOLOR}"
+
+        mkdir -p "$backup_dir"
+
+        for item in $unwanted_items; do
+            if [[ "$item" != "." ]]; then
+                mv "$item" "$backup_dir"
+            fi
+        done
+
+        echo -e "${GREEN}Files and folders moved to ${backup_dir}.${ENDCOLOR}"
+    else
+        echo -e "${GREEN}No unwanted files or folders detected. Proceeding...${ENDCOLOR}"
     fi
-
-    if ls *.php 1> /dev/null 2>&1; then
-        err "Error: PHP files found in the current directory. Please make sure you are running the script in the correct directory."
-    fi
-
-    if ls *.php 1> /dev/null 2>&1 || [[ -f ".htaccess" ]]; then
-        err "PHP files or .htaccess file found in the directory. Please clean the directory and try again."
-    fi
-
 }
+
 
 
 
@@ -263,7 +270,7 @@ update_wp_config() {
 echo -e "                                             ${BOLDGREEN}Hello fellow concierge! ${ENDCOLOR}\n"
 check_user
 check_home_directory
-check_for_default_wp_files
+backup_unwanted_files
 find_backup
 extract_backup
 create_database
