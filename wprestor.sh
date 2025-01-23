@@ -190,7 +190,7 @@ create_database() {
     
     local RANDOM_NUMBER=$(shuf -i 100-999 -n 1)
     DB_NAME="${USER}_wpr${RANDOM_NUMBER}"
-    DB_PASS=$(tr -dc 'A-Za-z0-9_!@#$%^&*()-+=' </dev/urandom | head -c 12)
+    DB_PASS=$(tr -dc 'A-Za-z0-9_!@#$%^*()-+=' </dev/urandom | head -c 12)
 
     # Log and display database details
     echo -e "\nYour database details (just in case):"
@@ -235,7 +235,6 @@ create_database() {
 }
 
 
-
 # Function to update wp-config.php with new database values
 update_wp_config() {
     echo -e "Let's update ${GREEN}wp-config.php${ENDCOLOR} file using the db details we have"
@@ -251,9 +250,12 @@ update_wp_config() {
 
     echo -e "\n${BLUE}Updating ${GREEN}wp-config.php${ENDCOLOR} ${BLUE}with new database values...${ENDCOLOR}"
 
+    # Escape special characters in the password
+    local ESCAPED_DB_PASS=$(printf '%s\n' "$DB_PASS" | sed -e 's/[\/&]/\\&/g')
+
     sed -i "s/^\(define( 'DB_NAME', '\)[^']*\('.*;\)$/\1$DB_NAME\2/" "$WP_CONFIG" || err "Something went wrong. Proceed further manually"
     sed -i "s/^\(define( 'DB_USER', '\)[^']*\('.*;\)$/\1$DB_NAME\2/" "$WP_CONFIG" || err "Something went wrong. Proceed further manually"
-    sed -i "s/^\(define( 'DB_PASSWORD', '\)[^']*\('.*;\)$/\1$DB_PASS\2/" "$WP_CONFIG" || err "Something went wrong. Proceed further manually"
+    sed -i "s/^\(define( 'DB_PASSWORD', '\)[^']*\('.*;\)$/\1$ESCAPED_DB_PASS\2/" "$WP_CONFIG" || err "Something went wrong. Proceed further manually"
 
     echo -e "\nVerify the updates in ${GREEN}wp-config.php${ENDCOLOR}:"
     grep "define( 'DB_NAME'" "$WP_CONFIG" || err "DB_NAME not found. Check and proceed further manually"
