@@ -31,6 +31,19 @@ check_home_directory() {
     ! grep "^${HOME}" <<< "${PWD}" && err "You should run it under user homedir!"
 }
 
+# Function to display a disclaimer and get user confirmation
+show_disclaimer() {
+    echo -e "${YELLOW}WARNING:${ENDCOLOR} This script will move all files in the current directory to a backup folder, excluding files with the following extensions: *.tar.gz, *.zip, *.sh, *.sql, and folders: cgi-bin, .well-known."
+    echo -e "${YELLOW}Current directory contents:${ENDCOLOR}"
+    ls -la
+    echo -e "${YELLOW}Do you understand and accept the responsibility for the consequences? [y/n]${ENDCOLOR}"
+    read -rp "> " user_response
+    if [[ ! "${user_response}" =~ ^[yY](es)?$ ]]; then
+        err "User did not accept the disclaimer. Exiting script."
+    fi
+    echo -e "${GREEN}User accepted the disclaimer. Proceeding with the script...${ENDCOLOR}"
+}
+
 #Function to check if there are unwanted files to move them to a separate folder
 backup_unwanted_files() {
     local backup_dir="previous_folder_backup"
@@ -291,6 +304,7 @@ update_wp_config() {
 echo -e "                                             ${BOLDGREEN}Hello fellow concierge! ${ENDCOLOR}\n"
 check_user
 check_home_directory
+show_disclaimer
 backup_unwanted_files
 find_backup
 extract_backup
