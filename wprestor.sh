@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # author Gennadiy Tselischev
+# revised by Oleksandr Molchanov
 
 # Colors
 ENDCOLOR="\e[0m"
