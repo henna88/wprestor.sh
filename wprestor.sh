@@ -44,7 +44,7 @@ show_disclaimer() {
     echo -e "${GREEN}User accepted the disclaimer. Proceeding with the script...${ENDCOLOR}"
 }
 
-#Function to check if there are unwanted files to move them to a separate folder
+# Function to check if there are unwanted files to move them to a separate folder
 backup_unwanted_files() {
     local backup_dir="previous_folder_backup"
 
@@ -54,6 +54,10 @@ backup_unwanted_files() {
         echo -e "${BLUE}Unwanted files and folders detected. Moving them to ${backup_dir}...${ENDCOLOR}"
 
         mkdir -p "$backup_dir"
+        # Check if the directory was created successfully
+        if [[ ! -d "$backup_dir" ]]; then
+            err "Failed to create backup directory ${backup_dir}. Exiting."
+        fi
 
         for item in $unwanted_items; do
             if [[ "$item" != "." ]]; then
@@ -66,7 +70,6 @@ backup_unwanted_files() {
         echo -e "${GREEN}No unwanted files or folders detected. Proceeding...${ENDCOLOR}"
     fi
 }
-
 
 
 
