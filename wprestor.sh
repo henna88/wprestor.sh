@@ -106,6 +106,14 @@ find_backup() {
 
 # Function to extract the selected backup
 extract_backup() {
+    # Check if tar has --keep-old-files option
+    TAR_SAFE=$(tar --help 2>/dev/null | grep -q -- "\s--keep-old-files\s" && echo true)
+    # Check if unzip has -n option
+    ZIP_SAFE=$(unzip --help 2>/dev/null | grep -q -- "\s-n\s" && echo true)
+
+    # Exit if either tar or unzip does not have the safe options
+    [[ -z "${TAR_SAFE}" || -z "${ZIP_SAFE}" ]] && err "tar or unzip failed safe check, exiting"
+
     if [[ "${BACKUP}" == *.tar.gz ]]; then
         echo -e "\n${BLUE}Checking integrity of${ENDCOLOR} ${BACKUP}${BLUE} as a .tar.gz archive...${ENDCOLOR}"
         echo "$(date '+%Y-%m-%d %H:%M:%S') - Checking integrity of ${BACKUP} as a .tar.gz archive..." >> "$LOG_FILE"
@@ -114,10 +122,10 @@ extract_backup() {
             err "The archive ${BACKUP} is corrupted or invalid. Details logged to $LOG_FILE."
         fi
 
-        echo -e "${BLUE}Extracting${ENDCOLOR} ${BACKUP}${BLUE} as a .tar.gz archive...${ENDCOLOR}"
-        echo "$(date '+%Y-%m-%d %H:%M:%S') - Extracting ${BACKUP} as a .tar.gz archive..." >> "$LOG_FILE"
+        echo -e "${BLUE}Extracting${ENDCOLOR} ${BACKUP}${BLUE} as a .tar.gz archive with --keep-old-files option...${ENDCOLOR}"
+        echo "$(date '+%Y-%m-%d %H:%M:%S') - Extracting ${BACKUP} as a .tar.gz archive with --keep-old-files option..." >> "$LOG_FILE"
         
-        if tar -zxvf "${BACKUP}" >> "$LOG_FILE" 2>&1; then
+        if tar --keep-old-files -zxvf "${BACKUP}" >> "$LOG_FILE" 2>&1; then
             echo -e "${GREEN}Backup ${BACKUP}${ENDCOLOR} ${GREEN}was restored successfully!${ENDCOLOR}"
             echo "$(date '+%Y-%m-%d %H:%M:%S') - Backup ${BACKUP} was restored successfully!" >> "$LOG_FILE"
         else
@@ -132,10 +140,10 @@ extract_backup() {
             err "The archive ${BACKUP} is corrupted or invalid. Details logged to $LOG_FILE."
         fi
 
-        echo -e "${BLUE}Extracting${ENDCOLOR} ${BACKUP}${BLUE} as a .zip archive...${ENDCOLOR}"
-        echo "$(date '+%Y-%m-%d %H:%M:%S') - Extracting ${BACKUP} as a .zip archive..." >> "$LOG_FILE"
+        echo -e "${BLUE}Extracting${ENDCOLOR} ${BACKUP}${BLUE} as a .zip archive with -n option...${ENDCOLOR}"
+        echo "$(date '+%Y-%m-%d %H:%M:%S') - Extracting ${BACKUP} as a .zip archive with -n option..." >> "$LOG_FILE"
         
-        if unzip "${BACKUP}" >> "$LOG_FILE" 2>&1; then
+        if unzip -n "${BACKUP}" >> "$LOG_FILE" 2>&1; then
             echo -e "${GREEN}Backup${ENDCOLOR} ${BACKUP} ${GREEN}was restored successfully!${ENDCOLOR}"
             echo "$(date '+%Y-%m-%d %H:%M:%S') - Backup ${BACKUP} was restored successfully!" >> "$LOG_FILE"
         else
