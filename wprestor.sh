@@ -49,7 +49,7 @@ show_disclaimer() {
 backup_unwanted_files() {
     local backup_dir="previous_folder_backup"
 
-    unwanted_items=$(find . -maxdepth 1 \( ! -name "*.tar.gz" ! -name "*.zip" ! -name "*.sh" ! -name "*.sql" ! -name "cgi-bin" ! -name ".well-known" \))
+    unwanted_items=$(find . -maxdepth 1 \( ! -name "." ! -name ".." ! -name "*.tar.gz" ! -name "*.zip" ! -name "*.sh" ! -name "*.sql" ! -name "cgi-bin" ! -name ".well-known" \))
 
     if [[ -n "$unwanted_items" ]]; then
         echo -e "${BLUE}Unwanted files and folders detected. Moving them to ${backup_dir}...${ENDCOLOR}"
