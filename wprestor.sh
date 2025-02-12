@@ -234,7 +234,7 @@ create_database() {
         fi
     done
 
-    DB_PASS=$(tr -dc 'A-Za-z0-9_!@#$%^*()-+=' </dev/urandom | head -c 12)
+    DB_PASS=$(tr -dc 'A-Za-z0-9' </dev/urandom | head -c 12)
 
     # Log and display database details
     echo -e "\nYour database details (just in case):"
